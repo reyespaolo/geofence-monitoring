@@ -9,11 +9,22 @@ const geofence = GeoFence.initialize({
 geofence.start();
 
 geofence.on('ready', (status) => {
-  geofence.lookUp( 121.00158333778381,14.6328616393338, (result) => {
-    console.log(result)
-  })
+  console.log(status)
+  geofence.lookUpGeofence(121.00158333778381,14.6328616393338);
+  // geofence.lookUpGeofence(121.00158333778381,14.6328616393338, (geofenceResults) => {
+  //   console.log(geofenceResults)
+  // })
 
 })
+
+geofence.on('lookUpGeofence:results', (geofenceResults) => {
+  geofence.arrangeGeofence(geofenceResults);
+})
+
+geofence.on('lookUpGeofence:error', (geofenceResultError) => {
+  console.log(geofenceResultError)
+})
+
 
 
 let server = app.listen(3030);

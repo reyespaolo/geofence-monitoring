@@ -1,62 +1,54 @@
-let mongoose = require('mongoose');
+let mongoose = require('mongoose')
 var uniqueValidator = require('mongoose-unique-validator')
+const Schema = mongoose.Schema
 
-const Schema = mongoose.Schema;
-
-var geofenceSchema = mongoose.Schema({
-  company: {
-  		type: mongoose.Schema.Types.ObjectId,
-  		ref: 'companies',
-  		index: true
-  },
+const GeofenceSchema = new Schema({
   name: {
-  		type: String,
-  		required: true
+    type: String,
+    required: true
   },
   description: String,
-  options: {
-    private: {
-      type: Boolean,
-      default: true
-    },
-    fillOpacity: {
-      type: Number,
-      default: 70
-    },
-    lineOpacity: {
-      type: Number,
-      default: 90
-    },
-    fillColor: {
-      type: String,
-      default: "000000"
-    },
-    lineColoe: {
-      type: String,
-      default: "000000"
-    },
-    radius: {
-      type: Number,
-      default: 0
-    }
+  availability: {
+    type: String,
+    required: true,
+    default: 'Private'
   },
-  geofence: {
+  company: {
+    type: Schema.Types.ObjectId,
+    ref: 'Company',
+    required: true,
+    index: true
+  },
+  geometry: {
     type: {
       type: String,
       required: true
     },
-    coordinates: [mongoose.Schema.Types.Mixed]
+    coordinates: [Schema.Types.Mixed]
   },
-   created_at: {
-     type: Date,
-     default: Date.now
-   },
-});
+  showAsAddress: {
+    type: Boolean,
+    required: true,
+    default: true
+  },
+  showMapAddress: {
+    type: Boolean,
+    required: true,
+    default: false
+  },
+  strokeColor: String,
+  strokeOpacity: Number,
+  strokeWeight: Number,
+  fillColor: String,
+  fillOpacity: Number,
+  isUploaded: Boolean
+}, {
+  timestamps: true
+})
 
-geofenceSchema.plugin(uniqueValidator);
-geofenceSchema.index({ geofence: '2dsphere' });
-// geofenceSchema.index({ name: 1, company: 1}, { unique: true });
+GeofenceSchema.plugin(uniqueValidator)
+GeofenceSchema.index({ geometry: '2dsphere' })
 
 
-var Geofence = mongoose.model('geofences', geofenceSchema);
-module.exports = Geofence;
+const Geofence = mongoose.model('Geofence', GeofenceSchema)
+module.exports = Geofence

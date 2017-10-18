@@ -70,7 +70,6 @@ Geofence.prototype.lookUpGeofence = function(geofenceObj, callback) {
       query[key] = geofenceObj.query[key]
     }
   }
-  console.log(query)
   geofence.find(
     query,
     (err, results) => {

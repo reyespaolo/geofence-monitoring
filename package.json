@@ -1,6 +1,6 @@
 {
   "name": "geofence-monitoring",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "",
   "main": "geofence/index.js",
   "dependencies": {

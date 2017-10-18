@@ -51,4 +51,4 @@ GeofenceSchema.index({ geometry: '2dsphere' })
 
 
 const Geofence = mongoose.model('Geofence', GeofenceSchema)
-module.exports = Geofence
+module.exports = { Geofence, GeofenceSchema, mongoose }

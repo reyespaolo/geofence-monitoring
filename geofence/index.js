@@ -1,12 +1,9 @@
 'use strict'
 
 const EventEmitter = require('events').EventEmitter
-const mongoose = require('mongoose')
-const geofence = require('./geofence.model.js')
 const util = require('util')
 const Polygon = require('polygon')
-const _ = require('lodash')
-mongoose.Promise = global.Promise
+const GeofenceModel = require('./geofence.model')
 
 const requiredOptions = [
   'dbURL',
@@ -20,17 +17,20 @@ function geoFenceError(message) {
 util.inherits(geoFenceError, Error)
 
 const validate = options => {
-  requiredOptions.forEach(function(option) {
-    if (!options[option]) {
-      throw new Error(`Missing Geofence Plugin option ${option}`)
-    }
-  })
+  if (!options.existingMongoose) {
+    requiredOptions.forEach(function(option) {
+      if (!options[option]) {
+        throw new Error(`Missing Geofence Plugin option ${option}`)
+      }
+    })
+  } 
 }
 
 function Geofence(options) {
   validate(options)
   this.dbURL = options.dbURL
   this.collection = options.collection
+  this.existingMongoose = options.existingMongoose
 }
 util.inherits(Geofence, EventEmitter)
 
@@ -40,16 +40,25 @@ Geofence.initialize = function(options) {
 
 Geofence.prototype.start = function() {
   let self = this
-  mongoose.connect(self.dbURL, {
-    useMongoClient: true
-  }, function(err, db) {
-    if (err) {
-      self.emit('error', 'Geofence Mongo Database Not Available!')
-    } else {
+  if (this.existingMongoose) {
+    this.geofence = this.existingMongoose.model('Geofence', GeofenceModel.GeofenceSchema)
+    setTimeout(() => {
       self.emit('ready', 'Geofence Mongo Database Ready')
+    }, 300)
+  } else {
+    this.geofence = GeofenceModel.Geofence
+    GeofenceModel.mongoose.Promise = global.Promise
+    GeofenceModel.mongoose.connect(self.dbURL, {
+      useMongoClient: true
+    }, function(err, db) {
+      if (err) {
+        self.emit('error', 'Geofence Mongo Database Not Available!')
+      } else {
+        self.emit('ready', 'Geofence Mongo Database Ready')
 
-    }
-  })
+      }
+    })
+  }
 }
 
 Geofence.prototype.lookUpGeofence = function(geofenceObj, callback) {
@@ -72,7 +81,7 @@ Geofence.prototype.lookUpGeofence = function(geofenceObj, callback) {
     }
   }
 
-  geofence.find(
+  this.geofence.find(
     query,
     (err, results) => {
       if (results) {

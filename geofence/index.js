@@ -65,12 +65,13 @@ Geofence.prototype.lookUpGeofence = function(geofenceObj, callback) {
       }
     }
   }
+
   if (geofenceObj.query) {
     for (let key in geofenceObj.query) {
       query[key] = geofenceObj.query[key]
     }
   }
-  console.log(query)
+
   geofence.find(
     query,
     (err, results) => {
@@ -118,7 +119,5 @@ Geofence.prototype.arrangeGeofence = (geofence) => {
       }
     }
   }
-
-  console.log(arrangement)
 }
 module.exports = Geofence
